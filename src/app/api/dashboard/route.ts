@@ -58,19 +58,7 @@ export async function GET() {
     // Get recent alerts
     const recentAlerts = await db.alert.findMany({
       take: 10,
-      orderBy: { createdAt: 'desc' },
-      include: {
-        coach: {
-          include: {
-            train: {
-              select: {
-                trainNumber: true,
-                trainName: true
-              }
-            }
-          }
-        }
-      }
+      orderBy: { createdAt: 'desc' }
     })
 
     // Get division-wise statistics
@@ -124,8 +112,7 @@ export async function GET() {
         type: alert.type,
         severity: alert.severity,
         message: alert.message,
-        coachNumber: alert.coach.coachNumber,
-        trainInfo: `${alert.coach.train.trainNumber} - ${alert.coach.train.trainName}`,
+        coachId: alert.coachId,
         createdAt: alert.createdAt
       }))
     })

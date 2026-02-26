@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     const feedback = await db.feedback.create({
       data: {
         ...validatedData,
-        overall,
+        overall: overall,
         ipAddress: request.ip || 'unknown',
         userAgent: request.headers.get('user-agent') || 'unknown'
       }
@@ -52,8 +52,12 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error('Feedback submission error:', error)
+    if (error instanceof Error) {
+      console.error('Error details:', error.message)
+      console.error('Error stack:', error.stack)
+    }
     return NextResponse.json(
-      { success: false, message: 'Invalid feedback data' },
+      { success: false, message: 'Invalid feedback data', error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 400 }
     )
   }
