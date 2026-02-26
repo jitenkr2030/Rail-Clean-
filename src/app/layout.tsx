@@ -14,24 +14,24 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Z.ai Code Scaffold - AI-Powered Development",
-  description: "Modern Next.js scaffold optimized for AI-powered development with Z.ai. Built with TypeScript, Tailwind CSS, and shadcn/ui.",
-  keywords: ["Z.ai", "Next.js", "TypeScript", "Tailwind CSS", "shadcn/ui", "AI development", "React"],
-  authors: [{ name: "Z.ai Team" }],
+  title: "RailClean AI - Smart Railway Cleanliness Monitoring",
+  description: "Transforming Indian Railways with AI-driven cleanliness monitoring, passenger feedback, and staff accountability. Real-time dashboard for railway officials.",
+  keywords: ["RailClean AI", "Indian Railways", "Cleanliness Monitoring", "Passenger Feedback", "Railway Management", "AI Insights", "Next.js", "TypeScript"],
+  authors: [{ name: "RailClean AI Team" }],
   icons: {
-    icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
+    icon: "/favicon.ico",
   },
   openGraph: {
-    title: "Z.ai Code Scaffold",
-    description: "AI-powered development with modern React stack",
-    url: "https://chat.z.ai",
-    siteName: "Z.ai",
+    title: "RailClean AI - Railway Cleanliness Monitoring",
+    description: "Real-time railway coach cleanliness monitoring with passenger feedback and AI insights for Indian Railways.",
+    url: "https://railclean.ai",
+    siteName: "RailClean AI",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Z.ai Code Scaffold",
-    description: "AI-powered development with modern React stack",
+    title: "RailClean AI",
+    description: "Smart railway cleanliness monitoring system for Indian Railways",
   },
 };
 
