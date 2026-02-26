@@ -1,0 +1,171 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Railway Division (e.g., Northern Railway, Western Railway)
+model Division {
+  id          String @id @default(cuid())
+  name        String @unique
+  code        String @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  stations Station[]
+  trains   Train[]
+}
+
+// Railway Station
+model Station {
+  id          String @id @default(cuid())
+  name        String
+  code        String @unique
+  divisionId  String
+  address     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  division       Division       @relation(fields: [divisionId], references: [id])
+  trainsOrigin   Train[]        @relation("StationOriginTrains")
+  trainsDest     Train[]        @relation("StationDestTrains")
+  cleaningTeams  CleaningTeam[]
+}
+
+// Train Information
+model Train {
+  id           String @id @default(cuid())
+  trainNumber  String @unique
+  trainName    String
+  divisionId   String
+  originId     String
+  destinationId String
+  type         String // Express, Superfast, Passenger, etc.
+  isActive     Boolean @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  division    Division @relation(fields: [divisionId], references: [id])
+  origin      Station  @relation("StationOriginTrains", fields: [originId], references: [id])
+  destination Station  @relation("StationDestTrains", fields: [destinationId], references: [id])
+  coaches     Coach[]
+}
+
+// Individual Coach
+model Coach {
+  id          String @id @default(cuid())
+  coachNumber String
+  trainId     String
+  type        String // AC1, AC2, AC3, Sleeper, General
+  qrCode      String @unique
+  isActive    Boolean @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  train     Train      @relation(fields: [trainId], references: [id])
+  feedback  Feedback[]
+  cleaning  CleaningRecord[]
+}
+
+// Passenger Feedback
+model Feedback {
+  id           String   @id @default(cuid())
+  coachId      String
+  cleanliness  Int      // 1-5 rating
+  toilet       Int      // 1-5 rating
+  odor         Int      // 1-5 rating
+  garbage      Int      // 1-5 rating
+  water        Int      // 1-5 rating
+  overall      Int      // 1-5 rating
+  comments     String?
+  language     String   @default("english") // english, hindi, etc.
+  ipAddress    String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+
+  coach Coach @relation(fields: [coachId], references: [id])
+}
+
+// Cleaning Staff/Team
+model CleaningTeam {
+  id          String @id @default(cuid())
+  name        String
+  leaderName  String
+  contact     String
+  stationId   String
+  isActive    Boolean @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  station Station        @relation(fields: [stationId], references: [id])
+  cleaning CleaningRecord[]
+}
+
+// Cleaning Record (Before/After photos and tracking)
+model CleaningRecord {
+  id             String   @id @default(cuid())
+  coachId        String
+  teamId         String
+  cleanedAt      DateTime @default(now())
+  beforePhotoUrl String?
+  afterPhotoUrl  String?
+  status         String   // scheduled, in_progress, completed, verified
+  verifiedBy     String?
+  verifiedAt     DateTime?
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  coach Coach        @relation(fields: [coachId], references: [id])
+  team  CleaningTeam @relation(fields: [teamId], references: [id])
+}
+
+// Alert System for Dirty Coaches
+model Alert {
+  id          String   @id @default(cuid())
+  coachId     String
+  type        String   // dirty_coach, low_rating, maintenance
+  severity    String   // low, medium, high, critical
+  message     String
+  isResolved  Boolean  @default(false)
+  resolvedBy  String?
+  resolvedAt  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Admin/Official Users
+model Admin {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  name        String
+  role        String   // admin, manager, official
+  divisionId  String?
+  permissions   String // JSON string for permissions
+  lastLogin   DateTime?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Analytics Summary (Pre-calculated for performance)
+model AnalyticsSummary {
+  id           String   @id @default(cuid())
+  date         DateTime
+  divisionId   String?
+  trainId      String?
+  totalFeedback Int     @default(0)
+  avgRating    Float    @default(0)
+  cleanCoaches Int      @default(0)
+  dirtyCoaches Int      @default(0)
+  alerts       Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
